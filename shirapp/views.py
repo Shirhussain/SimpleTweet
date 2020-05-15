@@ -1,3 +1,4 @@
+import  random
 from django.shortcuts import render
 from django.http import JsonResponse, Http404, HttpResponse
 
@@ -11,7 +12,7 @@ def home_view(request, *args, **kwargs):
 
 def list_view(request, *args, **kwargs):
     qs = Tweet.objects.all()
-    tweets_list = [{"id":x.id, "content":x.description} for x in qs]
+    tweets_list = [{"id":x.id, "content":x.description,"likes": random.randint(0,200)} for x in qs]
     data = {
         "isUser": False,
         "response": tweets_list
