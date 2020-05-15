@@ -1,0 +1,36 @@
+{% extends "base.html" %} 
+{% block title %} Home {% endblock %} 
+{% block content%} 
+welcome to shir nar twetter
+
+<div id = "lists">
+    Replace it
+</div>
+
+<script>
+    const tweetsElement = document.getElementById("lists") // geting HTML element 
+
+    const xhr = new XMLHttpRequest() //in django it's the same as --> xhr = SomeClasses()
+    const method = 'GET'
+    const url  = '/lists'
+    const responseType = 'json'
+
+    xhr.responseType = responseType
+    xhr.open(method, url)
+    xhr.onload = function(){
+        const serverResponse = xhr.response
+        const listedItems = serverResponse.response //array 
+        var finalTweetStr = ""
+        var i;
+        for (i=0;i<listedItems.length; i++){
+            console.log(i)
+            console.log(listedItems[i])
+            var currentItem = "<div class='mb-4'><h1>" + listedItems[i].id + "</h1>" + "<p>" + listedItems[i].content +"</p></div>"
+            finalTweetStr += currentItem
+        }
+        tweetsElement.innerHTML = finalTweetStr
+    }
+    xhr.send()
+</script>
+
+{% endblock %}
