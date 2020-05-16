@@ -9,6 +9,17 @@
 </div>
 
 
+<div class="row mb-3">
+    <div class="col-md-4 mx-auto col-10">
+        <form class="form" method="POST" action="{% url 'create' %}">
+            {% csrf_token %}
+            <input type="hidden" value="/" name="next">
+            <textarea name="description" class="form-control" placeholder="What is in your mind ?"></textarea>
+            <button type="submit" class="btn btn-primary">Tweet</button>
+        </form>
+    </div>
+</div>
+
 <div class="row" id="lists">
     Replace it
 </div>
