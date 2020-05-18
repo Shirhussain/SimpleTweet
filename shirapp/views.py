@@ -23,6 +23,9 @@ def create_view(request, *args, **kwargs):
     if form.is_valid():
         obj = form.save(commit=False)
         obj.save()
+        # when our Ajax is working i don't need the redirect (next_url) i can do many thing righ now 
+        if request.is_ajax():
+            return JsonResponse({}, status =201) #201 it means that created
         if next_url != None and is_safe_url(next_url, ALLOWED_HOSTS): 
             return redirect(next_url)
         form = TweetForm()
