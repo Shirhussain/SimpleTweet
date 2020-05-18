@@ -13,6 +13,7 @@
     <div class="col-md-4 mx-auto col-10">
         <form class="form" id="create_form" method="POST" action="{% url 'create' %}">
             {% csrf_token %}
+            <div class="d-none alert alert-danger" id="create-form-error"></div>
             <input type="hidden" value="/" name="next">
             <textarea name="description" class="form-control" placeholder="What is in your mind ?"></textarea>
             <button type="submit" class="btn btn-primary">Tweet</button>
@@ -25,6 +26,18 @@
 </div>
 
 <script>
+
+    function handleFormError(msg, display){
+        var myErrorDiv = document.getElementById("create-form-error")
+        if (display === true){
+            // show error 
+            myErrorDiv.setAttribute("class","d-block alert alert-danger")
+            myErrorDiv.innerText = msg
+        }else {
+            // hide error
+            myErrorDiv.setAttribute("class", "d-none alert alert-danger")
+        }
+    }
 
     function createFormSubmit(event){
         // i wnna prevnt that what form dos by default 
@@ -41,12 +54,31 @@
         xhr.setRequestHeader("HTTP_X_REQUESTED_WITH","XMLHttpRequest")
         xhr.setRequestHeader("X-Requested-With","XMLHttpRequest")
         xhr.onload = function(){
-            if (xhr.status ==201){
+            if (xhr.status ===201){
                 const newTweetJson = xhr.response
                 const newTweetElement = formatTweetElement(newTweetJson)
                 const ogHtml = tweetsContainerElement.innerHTML
                 tweetsContainerElement.innerHTML = newTweetElement + ogHtml
                 myForm.reset()
+            } else if (xhr.status ===400){
+                const errorJson = xhr.response
+                const contentError = errorJson.content
+                let contentErrorMsg;
+                if (contentError){
+                    contentErrorMsg = contentError[0]
+                    if (contentErrorMsg){
+                        handleFormError(contentErrorMsg, true)
+                    } else {
+                        alert("An error has accourd for 400 status")
+                    }
+                }else {
+                    alert("An error accourred   pleae try again dobara dobara  ")
+                }
+            } else if (xhr.status === 500){
+                alert("There wase a server Error ")
+            }
+            xhr.onerror = function(){
+                alert("An error occurred please try again")
             }
         }
         xhr.send(myFormData)
