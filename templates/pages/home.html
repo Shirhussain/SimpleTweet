@@ -11,7 +11,7 @@
 
 <div class="row mb-3">
     <div class="col-md-4 mx-auto col-10">
-        <form class="form" method="POST" action="{% url 'create' %}">
+        <form class="form" id="create_form" method="POST" action="{% url 'create' %}">
             {% csrf_token %}
             <input type="hidden" value="/" name="next">
             <textarea name="description" class="form-control" placeholder="What is in your mind ?"></textarea>
@@ -25,12 +25,56 @@
 </div>
 
 <script>
-    const tweetsElement = document.getElementById("lists") // geting HTML element 
 
-    const xhr = new XMLHttpRequest() //in django it's the same as --> xhr = SomeClasses()
-    const method = 'GET'
-    const url  = '/lists'
-    const responseType = 'json'
+    function createFormSubmit(event){
+        // i wnna prevnt that what form dos by default 
+        event.preventDefault()
+        // the reason i'm doning this way ( the following way ) is that i maybe i wnna reuse the createFormSubmit Function
+        const myForm = event.target
+        const myFormData = new FormData(myForm) // build in calss that related to formData, almost like dectionary of data 
+        const url = myForm.getAttribute("action")
+        const method = myForm.getAttribute("method")
+        const xhr = new XMLHttpRequest()
+        xhr.open(method, url)
+        xhr.onload = function(){
+            const serverResponse = xhr.response
+            // console.log(serverResponse)
+            const tweetsEl = document.getElementById("lists") 
+            loadTweets(tweetsEl)
+        }
+        xhr.send(myFormData)
+    }
+
+    const createFormEL = document.getElementById("create_form")
+
+    createFormEL.addEventListener("submit",createFormSubmit)
+
+    const tweetsEl = document.getElementById("lists") // geting HTML element 
+
+    function loadTweets(tweetsElement){
+        const xhr = new XMLHttpRequest() //in django it's the same as --> xhr = SomeClasses()
+        const method = 'GET'
+        const url  = '/lists'
+        const responseType = 'json'
+        xhr.responseType = responseType
+        xhr.open(method, url)
+        xhr.onload = function(){
+            const serverResponse = xhr.response
+            const listedItems = serverResponse.response //array  
+            var finalTweetStr = ""
+            var i;
+            for (i=0;i<listedItems.length; i++){
+                var tweetObj = listedItems[i]
+                var currentItem = formatTweetElement(tweetObj)
+                finalTweetStr += currentItem
+            }
+            tweetsElement.innerHTML = finalTweetStr
+        }
+        xhr.send()
+    }
+
+    loadTweets(tweetsEl)
+
 
     function handleDidLike(tweet_id, currentCount){
         console.log(tweet_id, currentCount)
@@ -48,21 +92,6 @@
                 "</div></div>"
         return formattedTweet
     }
-    xhr.responseType = responseType
-    xhr.open(method, url)
-    xhr.onload = function(){
-        const serverResponse = xhr.response
-        const listedItems = serverResponse.response //array  
-        var finalTweetStr = ""
-        var i;
-        for (i=0;i<listedItems.length; i++){
-            var tweetObj = listedItems[i]
-            var currentItem = formatTweetElement(tweetObj)
-            finalTweetStr += currentItem
-        }
-        tweetsElement.innerHTML = finalTweetStr
-    }
-    xhr.send()
 </script>
 
 {% endblock %}

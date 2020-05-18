@@ -13,7 +13,7 @@ SECRET_KEY = '+9w4ebhb%*!bu^d_t7%_6n$@k&xv9=!8n97&+a@ql%l!x*)^4c'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','shir.com']
 
 
 # Application definition
