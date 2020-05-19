@@ -15,6 +15,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1','shir.com']
 
+#max tweet length 
+MAX_TWEET_LENGTH = 240
+
 
 # Application definition
 
@@ -26,7 +29,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    #my app
     'shirapp',
+
+
+    #third party
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -108,3 +116,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#login user
+LOGIN_URL = "/login"
