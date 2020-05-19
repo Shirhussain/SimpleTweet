@@ -4,9 +4,10 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404, HttpResponse
 from django.utils.http import is_safe_url
 
-
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes,permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from . serializers import TweetSerializer
 from .models import Tweet
@@ -21,8 +22,10 @@ def home_view(request, *args, **kwargs):
     return render(request, "pages/home.html", context={}, status=200)
 
 @api_view(['POST']) # method that client have to send === "POST"
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
 def create_view(request, *args, **kwargs):
-    serializer = TweetSerializer(data=request.POST or None)
+    serializer = TweetSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
         serializer.save(user=request.user)
         return Response(serializer.data, status = 201) #201 Created. 
@@ -30,7 +33,6 @@ def create_view(request, *args, **kwargs):
     
 @api_view(['GET'])
 def list_view(request, *args, **kwargs):
-    pass
     qs = Tweet.objects.all()
     serializer = TweetSerializer(qs, many=True)
     return Response(serializer.data)
@@ -44,6 +46,20 @@ def detail_view(request, tweet_id, * args, **kwargs):
     obj = qs.first()
     serializer = TweetSerializer(obj)
     return Response(serializer.data, status=200)
+    
+
+@api_view(['DELETE', 'POST'])
+@permission_classes([IsAuthenticated])
+def delete_view(request, tweet_id, *args, **kwargs):
+    qs = Tweet.objects.filter(id=tweet_id)
+    if not qs.exists():
+        return Response({}, status=404)
+    qs = qs.filter(user=request.user)
+    if not qs.exists():
+        return Response({"Message": "you can not deete thsi tweet unutorised"}, status=401)
+    obj = qs.first()
+    obj.delete()
+    return Response({"Message": "Tweet Removed"}, status=200)
     
 
 def create_view_pure_django(request, *args, **kwargs):

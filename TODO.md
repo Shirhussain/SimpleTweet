@@ -15,7 +15,7 @@
             -> Image
         -> deleteing
         -> Retweeting
-        -> Liking
+        -> Liking or Uniking
 
 3.  Following/ Followers
 
