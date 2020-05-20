@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes,permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from . serializers import TweetSerializer
+from . serializers import TweetSerializer, ActionSerializer
 from .models import Tweet
 from .forms import TweetForm
 
@@ -61,6 +61,35 @@ def delete_view(request, tweet_id, *args, **kwargs):
     obj.delete()
     return Response({"Message": "Tweet Removed"}, status=200)
     
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def action_view(request, tweet_id, *args, **kwargs):
+    '''
+    id is required 
+    Action option are : like , Unlike , Retweet
+    '''
+    serializer = ActionSerializer(request.POST)
+    if serializer.is_valid(raise_exception=True):
+        data = serializer.validated_data
+        tweet_id = data.get("id")
+        action   = data.get("action")
+        qs = Tweet.objects.filter(id=tweet_id)
+        if not qs.exists():
+            return Response({}, status=404)
+        obj = qs.first()
+        if action == "like":
+            obj.likes.add(request.user)
+        elif action == "unlike":
+            obj.likes.remove(request.user)
+        elif action == "retweet":
+            # to do 
+            pass
+    return Response({"message": "Tweet XXX "}, status=200)
+
+
+
 
 def create_view_pure_django(request, *args, **kwargs):
     user = request.user 
