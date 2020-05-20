@@ -4,6 +4,7 @@ from django.conf import settings
 
 MAX_TWEET_LENGTH = settings.MAX_TWEET_LENGTH
 TWEET_ACTION_OPTIONS = settings.TWEET_ACTION_OPTIONS
+
 class ActionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     action = serializers.CharField()
@@ -16,9 +17,13 @@ class ActionSerializer(serializers.Serializer):
 
 
 class TweetSerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Tweet
-        fields = ['description']
+        fields = ['id', 'description', 'likes']  # actually i don't want to the list of likes but i'm gnna use as a number
+    
+    def get_likes(self, obj):
+        return obj.likes.count()
 
     def validate_content(self, value):
         if len(value) > MAX_TWEET_LENGTH:
